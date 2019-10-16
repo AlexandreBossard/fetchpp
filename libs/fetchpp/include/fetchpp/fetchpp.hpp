@@ -6,5 +6,5 @@
 
 namespace fetchpp
 {
-std::future<std::vector<uint8_t>> fetch(std::string const& url);
+std::future<std::string> fetch(std::string const& url);
 }

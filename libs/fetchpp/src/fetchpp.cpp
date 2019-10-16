@@ -3,7 +3,7 @@
 
 namespace fetchpp
 {
-std::future<std::string> fetch(std::string url)
+std::future<std::string> fetch(std::string const &url)
 {
   fmt::print("the given url: {}", url);
   auto task = std::packaged_task<std::string(std::string)>(

@@ -11,20 +11,20 @@
                 "isDefault": true
             },
             "command": "cn",
-            "problemMatcher":"$gcc",
+            "problemMatcher": "$gcc",
             "args": [
                 "-b",
-                "build-default",
+                "default",
             ]
         },
         {
             "label": "configure",
             "type": "shell",
-            "problemMatcher":"$lessCompile",
+            "problemMatcher": "$lessCompile",
             "command": "cn",
             "args": [
                 "-c",
-                "build-default",
+                "default",
             ]
         }
     ]

@@ -1,10 +1,9 @@
 #pragma once
 
-#include <future>
 #include <string>
 #include <vector>
 
 namespace fetchpp
 {
-std::future<std::string> fetch(std::string const& url);
+std::vector<uint8_t> fetch(std::string const& url);
 }

@@ -20,6 +20,20 @@ using tcp = net::ip::tcp;
 
 namespace fetchpp
 {
+field_arg::field_arg(http::field field, std::string value)
+  : field(std::move(field)),
+    field_name(to_string(field)),
+    value(std::move(value))
+{
+}
+
+field_arg::field_arg(std::string name, std::string value)
+  : field(http::string_to_field(name)),
+    field_name(std::move(name)),
+    value(std::move(value))
+{
+}
+
 class ssl_fecther
 {
 public:
@@ -52,7 +66,7 @@ public:
   }
 
   template <typename BodyType, typename ResponseBody = http::dynamic_body>
-  http::response<ResponseBody> fetch(http::request<BodyType> const& req)
+  http::response<ResponseBody> execute(http::request<BodyType> const& req)
   {
     http::write(stream, req);
     auto buffer = beast::flat_buffer{};
@@ -61,7 +75,9 @@ public:
     return res;
   }
 };
-response<> fetch(std::string const& purl)
+
+response<> fetch(std::string const& purl,
+                 std::initializer_list<field_arg> fields)
 {
   fmt::print("the given url: {}\n", purl);
   net::io_context ioc;
@@ -82,8 +98,10 @@ response<> fetch(std::string const& purl)
   auto req = http::request<http::empty_body>(http::verb::get, url.target, 11);
   req.set(http::field::host, url.domain);
   req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+  for (auto const& field : fields)
+    req.insert(field.field, field.field_name, field.value);
 
-  auto response = fetcher.fetch(req);
+  auto response = fetcher.execute(req);
   fetcher.stop();
   return response;
 }

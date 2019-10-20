@@ -54,3 +54,16 @@ TEST_CASE("http get", "[https][sync]")
     fmt::print("{}: {}\n", field.name_string(), field.value());
   fmt::print("{}\n", response.body());
 }
+
+TEST_CASE("http get with headers", "[https][sync]")
+{
+  auto const response =
+      fetchpp::fetch("get"_https,
+                     {{"x-special-header", "a value worth reading"},
+                      {fetchpp::field::topic, "http by the book"}});
+  REQUIRE(response.result_int() == 200);
+  REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
+  for (auto const& field : response)
+    fmt::print("{}: {}\n", field.name_string(), field.value());
+  fmt::print("{}\n", response.body());
+}

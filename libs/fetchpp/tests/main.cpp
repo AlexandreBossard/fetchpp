@@ -1,7 +1,2 @@
-#include <fetchpp/fetchpp.hpp>
-
-int main(int ac, char** argv)
-{
-  fetchpp::fetch("http://metal.nightfall.fr");
-  return 0;
-}
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>

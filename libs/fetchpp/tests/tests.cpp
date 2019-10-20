@@ -45,9 +45,9 @@ std::string operator""_https(const char* target, std::size_t)
   return fmt::format("https://{}/{}", TEST_URL, target);
 }
 
-TEST_CASE("http get", "[http][sync]")
+TEST_CASE("http get", "[https][sync]")
 {
-  auto const response = fetchpp::fetch("get"_http);
+  auto const response = fetchpp::fetch("get"_https);
   REQUIRE(response.result_int() == 200);
   REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
   for (auto const& field : response)

@@ -23,25 +23,27 @@ response<> fetch(std::string const& purl)
 
   tcp::resolver resolver(ioc);
   // beast::tcp_stream stream(ioc);
-  tcp::socket socket(ioc);
+  beast::tcp_stream stream(ioc);
 
   auto const url = detail::parse_url(purl);
   fmt::print(
       "domain: {}, service {} target{}\n", url.domain, url.scheme, url.target);
   auto const results = resolver.resolve(url.domain, url.scheme);
-  net::connect(socket, results.begin(), results.end());
+  stream.connect(results);
   auto req = http::request<http::empty_body>(http::verb::get, url.target, 11);
   req.set(http::field::host, url.domain);
   req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
 
-  http::write(socket, req);
+  http::write(stream, req);
 
   auto buffer = beast::flat_buffer{};
   auto res = http::response<http::dynamic_body>{};
-  http::read(socket, buffer, res);
+  http::read(stream, buffer, res);
 
   boost::system::error_code ec;
-  socket.shutdown(tcp::socket::shutdown_both, ec);
+  stream.socket().shutdown(tcp::socket::shutdown_both, ec);
+  if (ec && ec != beast::errc::not_connected)
+    throw beast::system_error{ec};
   return res;
 }
 }

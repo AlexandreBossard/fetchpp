@@ -59,6 +59,7 @@ TEST_CASE("http get with headers", "[https][sync]")
 {
   auto const response =
       fetchpp::fetch("get"_https,
+                     fetchpp::verb::get,
                      {{"x-special-header", "a value worth reading"},
                       {fetchpp::field::topic, "http by the book"}});
   REQUIRE(response.result_int() == 200);

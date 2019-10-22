@@ -4,8 +4,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 add_library(fetchpp
   include/fetchpp/fetchpp.hpp
+  include/fetchpp/field_arg.hpp
+  include/fetchpp/field.hpp
+  include/fetchpp/http.hpp
+
+  src/detail/parse_url.hpp
 
   src/fetchpp.cpp
+  src/field_arg.cpp
   src/detail/parse_url.cpp
 )
 

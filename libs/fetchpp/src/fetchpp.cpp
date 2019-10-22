@@ -1,3 +1,5 @@
+#include <fetchpp/field_arg.hpp>
+
 #include "detail/parse_url.hpp"
 
 #include <boost/asio.hpp>
@@ -13,28 +15,13 @@
 #include <fmt/ostream.h>
 
 namespace beast = boost::beast;
-namespace http = boost::beast::http;
 namespace net = boost::asio;
 namespace ssl = net::ssl;
 using tcp = net::ip::tcp;
 
 namespace fetchpp
 {
-field_arg::field_arg(http::field field, std::string value)
-  : field(std::move(field)),
-    field_name(to_string(field)),
-    value(std::move(value))
-{
-}
-
-field_arg::field_arg(std::string name, std::string value)
-  : field(http::string_to_field(name)),
-    field_name(std::move(name)),
-    value(std::move(value))
-{
-}
-
-class ssl_fecther
+class ssl_fetcher
 {
 public:
   using stream_type = beast::ssl_stream<beast::tcp_stream>;
@@ -44,7 +31,7 @@ private:
   stream_type stream;
 
 public:
-  ssl_fecther(net::io_context& ioc)
+  ssl_fetcher(net::io_context& ioc)
     : ctx(ssl::context::tlsv12_client), stream(ioc, ctx)
   {
     // FIXME
@@ -70,13 +57,14 @@ public:
   {
     http::write(stream, req);
     auto buffer = beast::flat_buffer{};
-    auto res = http::response<http::dynamic_body>{};
+    auto res = http::response<ResponseBody>{};
     http::read(stream, buffer, res);
     return res;
   }
 };
 
 response<> fetch(std::string const& purl,
+                 verb method,
                  std::initializer_list<field_arg> fields)
 {
   fmt::print("the given url: {}\n", purl);
@@ -91,7 +79,7 @@ response<> fetch(std::string const& purl,
   auto const results = resolver.resolve(url.domain, url.scheme);
   if (url.scheme != "https")
     throw std::runtime_error("protocol not handled");
-  ssl_fecther fetcher(ioc);
+  ssl_fetcher fetcher(ioc);
 
   fetcher.start(results);
 

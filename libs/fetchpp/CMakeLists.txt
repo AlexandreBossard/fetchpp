@@ -6,13 +6,20 @@ add_library(fetchpp
   include/fetchpp/fetchpp.hpp
   include/fetchpp/field_arg.hpp
   include/fetchpp/field.hpp
-  include/fetchpp/http.hpp
+
+  include/fetchpp/alias/beast.hpp
+  include/fetchpp/alias/http.hpp
+  include/fetchpp/alias/net.hpp
 
   src/detail/parse_url.hpp
+  src/detail/ssl_client.hpp
+
+  src/detail/parse_url.cpp
+  src/detail/ssl_client.cpp
 
   src/fetchpp.cpp
   src/field_arg.cpp
-  src/detail/parse_url.cpp
+
 )
 
 target_include_directories(fetchpp

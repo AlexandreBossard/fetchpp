@@ -1,7 +1,8 @@
 #pragma once
 
 #include <fetchpp/field_arg.hpp>
-#include <fetchpp/http.hpp>
+
+#include <fetchpp/alias/http.hpp>
 
 #include <string>
 #include <vector>

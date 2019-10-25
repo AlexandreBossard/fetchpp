@@ -13,7 +13,7 @@ class FetchppConan(ConanFile):
     requires = (("boost/1.71.0@_/_"), ("openssl/1.1.1d@_/_"), ("fmt/6.0.0@_/_"))
     build_requires = "Catch2/2.10.0@catchorg/stable"
     options = {"shared": [True, False], "fPIC": [True, False], "warn_as_error": [True, False]}
-    default_options = {"shared": False, "fPIC": False, "warn_as_error": True, "boost:system_no_deprecated": True, "boost:asio_no_deprecated": True, "boost:filesystem_no_deprecated": True, "boost:without_math": True, "boost:without_log": True}
+    default_options = {"shared": False, "fPIC": False, "warn_as_error": False, "boost:system_no_deprecated": True, "boost:asio_no_deprecated": True, "boost:filesystem_no_deprecated": True, "boost:without_math": True, "boost:without_log": True}
     generators = "cmake", "ycm"
     exports_sources = "CMakeLists.txt", "libs/*"
     cmake = None

@@ -1,5 +1,6 @@
 #include <fetchpp/fetchpp.hpp>
 
+#include <fetchpp/alias/error_code.hpp>
 #include <fetchpp/alias/net.hpp>
 #include <fetchpp/version.hpp>
 
@@ -13,32 +14,57 @@
 namespace fetchpp
 {
 
-response<> fetch(std::string const& purl,
-                 verb method,
-                 std::initializer_list<field_arg> fields)
+// response<> fetch(std::string const& purl,
+//                  verb method,
+//                  std::initializer_list<field_arg> fields)
+// {
+//   fmt::print("the given url: {}\n", purl);
+//   net::io_context ioc;
+
+//   tcp::resolver resolver(ioc);
+
+//   auto const url = detail::parse_url(purl);
+//   auto const results = resolver.resolve(url.domain, url.scheme);
+//   if (url.scheme != "https")
+//     throw std::runtime_error("protocol not handled");
+
+//   detail::ssl_client fetcher(ioc);
+
+//   fetcher.start(results);
+
+//   auto req = http::request<http::string_body>(method, url.target, 11);
+//   req.set(http::field::host, url.domain);
+//   req.set(http::field::user_agent, fetchpp::VERSION);
+//   for (auto const& field : fields)
+//     req.insert(field.field, field.field_name, field.value);
+
+//   auto response = fetcher.execute(req);
+//   fetcher.stop();
+//   return response;
+// }
+
+std::future<response<>> async_fetch(std::string const& purl,
+                                    verb method,
+                                    std::initializer_list<field_arg> fields)
 {
   fmt::print("the given url: {}\n", purl);
   net::io_context ioc;
 
-  tcp::resolver resolver(ioc);
-
   auto const url = detail::parse_url(purl);
-  auto const results = resolver.resolve(url.domain, url.scheme);
   if (url.scheme != "https")
     throw std::runtime_error("protocol not handled");
 
-  detail::ssl_client fetcher(ioc);
+  auto req = http::request<http::empty_body>(method, url.target, 11);
 
-  fetcher.start(results);
-
-  auto req = http::request<http::string_body>(method, url.target, 11);
   req.set(http::field::host, url.domain);
   req.set(http::field::user_agent, fetchpp::VERSION);
   for (auto const& field : fields)
     req.insert(field.field, field.field_name, field.value);
 
-  auto response = fetcher.execute(req);
-  fetcher.stop();
-  return response;
+  auto client =
+      detail::create_client<decltype(req), response<>>(std::move(req), ioc);
+  auto fut = client->execute(url.domain, url.port);
+  ioc.run();
+  return fut;
 }
 }

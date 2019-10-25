@@ -15,7 +15,6 @@ add_library(fetchpp
   src/detail/ssl_client.hpp
 
   src/detail/parse_url.cpp
-  src/detail/ssl_client.cpp
 
   src/fetchpp.cpp
   src/field_arg.cpp

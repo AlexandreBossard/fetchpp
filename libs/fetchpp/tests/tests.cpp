@@ -45,26 +45,33 @@ std::string operator""_https(const char* target, std::size_t)
   return fmt::format("https://{}/{}", TEST_URL, target);
 }
 
-TEST_CASE("http get", "[https][sync]")
-{
-  auto const response = fetchpp::fetch("get"_https);
-  REQUIRE(response.result_int() == 200);
-  REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
-  for (auto const& field : response)
-    fmt::print("{}: {}\n", field.name_string(), field.value());
-  fmt::print("{}\n", response.body());
-}
+// TEST_CASE("http get", "[https][sync]")
+// {
+//   auto const response = fetchpp::fetch("get"_https);
+//   REQUIRE(response.result_int() == 200);
+//   REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
+//   for (auto const& field : response)
+//     fmt::print("{}: {}\n", field.name_string(), field.value());
+//   fmt::print("{}\n", response.body());
+// }
 
-TEST_CASE("http get with headers", "[https][sync]")
+// TEST_CASE("http get with headers", "[https][sync]")
+// {
+//   auto const response =
+//       fetchpp::fetch("get"_https,
+//                      fetchpp::verb::get,
+//                      {{"x-special-header", "a value worth reading"},
+//                       {fetchpp::field::topic, "http by the book"}});
+//   REQUIRE(response.result_int() == 200);
+//   REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
+//   for (auto const& field : response)
+//     fmt::print("{}: {}\n", field.name_string(), field.value());
+//   fmt::print("{}\n", response.body());
+// }
+
+TEST_CASE("http async get", "[https][sync]")
 {
-  auto const response =
-      fetchpp::fetch("get"_https,
-                     fetchpp::verb::get,
-                     {{"x-special-header", "a value worth reading"},
-                      {fetchpp::field::topic, "http by the book"}});
+  auto fut = fetchpp::async_fetch(""_https, fetchpp::verb::get);
+  auto response = fut.get();
   REQUIRE(response.result_int() == 200);
-  REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
-  for (auto const& field : response)
-    fmt::print("{}: {}\n", field.name_string(), field.value());
-  fmt::print("{}\n", response.body());
 }

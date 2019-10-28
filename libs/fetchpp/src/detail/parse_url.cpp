@@ -1,5 +1,5 @@
-#include "detail/parse_url.hpp"
 #include <exception>
+#include <fetchpp/detail/parse_url.hpp>
 #include <regex>
 
 namespace fetchpp

@@ -11,12 +11,11 @@ add_library(fetchpp
   include/fetchpp/alias/http.hpp
   include/fetchpp/alias/net.hpp
 
-  src/detail/parse_url.hpp
-  src/detail/ssl_client.hpp
+  include/fetchpp/detail/parse_url.hpp
+  include/fetchpp/detail/ssl_client.hpp
 
   src/detail/parse_url.cpp
 
-  src/fetchpp.cpp
   src/field_arg.cpp
 
 )

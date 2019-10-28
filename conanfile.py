@@ -12,7 +12,7 @@ class FetchppConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     requires = (
         ("boost/1.71.0"), ("openssl/1.1.1d"),
-        ("fmt/6.0.0")
+        ("fmt/6.0.0"), ("jsonformoderncpp/3.7.0@vthiery/stable")
     )
     build_requires = "Catch2/2.10.0@catchorg/stable"
     options = {"shared": [True, False], "fPIC": [True, False], "warn_as_error": [True, False]}

@@ -116,3 +116,24 @@ TEST_CASE("http async post string", "[https][post][async]")
   REQUIRE(json.at("headers").at("X-Corp-Header") == "corp value");
   REQUIRE(json.at("data") == data);
 }
+
+TEST_CASE("http async post string with init", "[https][fetch][init][async]")
+{
+  fetchpp::net::io_context ioc;
+  fetchpp::ssl::context context(fetchpp::ssl::context::tlsv12_client);
+  fetchpp::beast::ssl_stream<fetchpp::beast::tcp_stream> stream(ioc, context);
+  auto const data = std::string("this is my data");
+  auto init = fetchpp::options<fetchpp::http::string_body>{
+      fetchpp::http::verb::post,
+      fetchpp::cache_mode::no_store,
+      fetchpp::redirect_handling::manual,
+      false,
+      {{"X-corp-header", "corp value"}},
+      data};
+  auto fut = fetchpp::async_fetch(
+      stream, "post"_https, std::move(init), boost::asio::use_future);
+  ioc.run();
+  auto response = fut.get();
+  REQUIRE(response.result_int() == 200);
+  // REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
+}

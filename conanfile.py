@@ -10,7 +10,10 @@ class FetchppConan(ConanFile):
     description = "the simplest http client"
     topics = ("http", "beast", "fetch", "client")
     settings = "os", "compiler", "build_type", "arch"
-    requires = (("boost/1.71.0@_/_"), ("openssl/1.1.1d@_/_"), ("fmt/6.0.0@_/_"))
+    requires = (
+        ("boost/1.71.0"), ("openssl/1.1.1d"),
+        ("fmt/6.0.0")
+    )
     build_requires = "Catch2/2.10.0@catchorg/stable"
     options = {"shared": [True, False], "fPIC": [True, False], "warn_as_error": [True, False]}
     default_options = {"shared": False, "fPIC": False, "warn_as_error": False, "boost:system_no_deprecated": True, "boost:asio_no_deprecated": True, "boost:filesystem_no_deprecated": True, "boost:without_math": True, "boost:without_log": True}

@@ -29,7 +29,7 @@ target_include_directories(fetchpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_link_libraries(fetchpp PUBLIC CONAN_PKG::fmt CONAN_PKG::boost CONAN_PKG::openssl)
+target_link_libraries(fetchpp PUBLIC CONAN_PKG::fmt CONAN_PKG::Boost CONAN_PKG::openssl)
 
 
 if(ENABLE_TESTING)

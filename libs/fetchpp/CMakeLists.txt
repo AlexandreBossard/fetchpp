@@ -6,6 +6,8 @@ add_library(fetchpp
   include/fetchpp/fetchpp.hpp
   include/fetchpp/field_arg.hpp
   include/fetchpp/field.hpp
+  include/fetchpp/message.hpp
+  include/fetchpp/async_process_one.hpp
 
   include/fetchpp/alias/beast.hpp
   include/fetchpp/alias/http.hpp

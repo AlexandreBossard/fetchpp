@@ -1,8 +1,9 @@
 #pragma once
 
-#include <fetchpp/alias/http.hpp>
 
 #include <boost/beast/http/field.hpp>
+
+#include <fetchpp/alias/http.hpp>
 
 namespace fetchpp
 {

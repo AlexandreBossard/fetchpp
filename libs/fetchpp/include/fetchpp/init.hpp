@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fetchpp/alias/http.hpp>
+#include <fetchpp/message.hpp>
 
 #include <fetchpp/field_arg.hpp>
 

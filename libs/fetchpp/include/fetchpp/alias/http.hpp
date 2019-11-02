@@ -1,9 +1,8 @@
 #pragma once
 
-
-#include <boost/beast/http.hpp>
+#include <fetchpp/alias/beast.hpp>
 
 namespace fetchpp
 {
-namespace http = boost::beast::http;
+namespace http = beast::http;
 }

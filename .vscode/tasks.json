@@ -10,21 +10,28 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "command": "cn",
+            "command": "conan",
             "problemMatcher": "$gcc",
             "args": [
+                "build",
+                ".",
+                "-bf",
+                "build-default",
                 "-b",
-                "default",
             ]
         },
         {
             "label": "configure",
             "type": "shell",
             "problemMatcher": "$lessCompile",
-            "command": "cn",
+            "command": "conan",
             "args": [
-                "-c",
-                "default",
+                "install",
+                ".",
+                "--install-folder",
+                "build-default",
+                "--build",
+                "missing",
             ]
         }
     ]

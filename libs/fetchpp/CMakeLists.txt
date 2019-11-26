@@ -7,14 +7,13 @@ add_library(fetchpp
   include/fetchpp/field_arg.hpp
   include/fetchpp/field.hpp
   include/fetchpp/message.hpp
-  include/fetchpp/async_process_one.hpp
+  include/fetchpp/process_one.hpp
 
   include/fetchpp/alias/beast.hpp
   include/fetchpp/alias/http.hpp
   include/fetchpp/alias/net.hpp
 
   include/fetchpp/detail/parse_url.hpp
-  include/fetchpp/detail/ssl_client.hpp
 
   src/detail/parse_url.cpp
 

@@ -7,13 +7,15 @@
 #include <fetchpp/alias/http.hpp>
 #include <fetchpp/alias/net.hpp>
 
-#include <fetchpp/field_arg.hpp>
 #include <fetchpp/cache_mode.hpp>
-#include <fetchpp/redirect_handling.hpp>
+#include <fetchpp/field_arg.hpp>
 #include <fetchpp/options.hpp>
+#include <fetchpp/prepare_request.hpp>
+#include <fetchpp/redirect_handling.hpp>
+
 #include <fetchpp/version.hpp>
 
-#include <fetchpp/detail/parse_url.hpp>
+#include <fetchpp/url.hpp>
 
 #include <boost/beast/core/async_base.hpp>
 #include <boost/beast/http/empty_body.hpp>
@@ -23,25 +25,6 @@
 
 namespace fetchpp
 {
-
-template <typename BodyRequest>
-auto prepare_request(detail::url const& url, options<BodyRequest> const& opt)
-    -> http::request<BodyRequest>
-{
-  auto req = http::request<BodyRequest>(
-      opt.method, url.target, 11, std::move(opt.body));
-  req.set(http::field::host, url.domain);
-  req.set(http::field::user_agent, fetchpp::VERSION);
-  for (auto const& field : opt.headers)
-    req.insert(field.field, field.field_name, field.value);
-  // auto it = req.find(http::field::connection);
-  // if (it != req.end())
-  //   opt.keep_alive = it == beast::string_view("keep-alive");
-  // else if (opt.keep_alive)
-  //   req.set(http::field::connection, "keep-alive");
-  req.prepare_payload();
-  return req;
-}
 
 template <typename CompletionToken, typename BodyResponse>
 using async_http_result =
@@ -96,17 +79,14 @@ auto async_get(AsyncStream& stream,
     };
 
     AsyncStream& stream;
-    detail::url url;
+    url _url;
     temporary_data& data;
     status state = status::starting;
 
-    op(AsyncStream& stream,
-       Request preq,
-       detail::url purl,
-       handler_type& handler)
+    op(AsyncStream& stream, Request preq, url purl, handler_type& handler)
       : base_type(std::move(handler), stream.get_executor()),
         stream(stream),
-        url(purl),
+        _url(purl),
         data(beast::allocate_stable<temporary_data>(
             *this, stream, std::move(preq)))
     {
@@ -121,7 +101,8 @@ auto async_get(AsyncStream& stream,
         {
         case starting:
           state = status::resolving;
-          data.resolver.async_resolve(url.domain, url.scheme, std::move(*this));
+          data.resolver.async_resolve(
+              _url.domain(), _url.scheme(), std::move(*this));
           return;
         case connecting:
           state = status::processing;
@@ -149,14 +130,17 @@ auto async_get(AsyncStream& stream,
     }
   };
 
-  auto url = detail::parse_url(purl);
-  auto request = prepare_request(url,
+  auto const curl = url{purl};
+  auto request = prepare_request(curl,
                                  options<BodyRequest>{http::verb::get,
                                                       cache_mode::no_store,
                                                       redirect_handling::manual,
                                                       fields});
   async_completion_t async_comp{handler};
-  op(stream, std::move(request), std::move(url), async_comp.completion_handler);
+  op(stream,
+     std::move(request),
+     std::move(curl),
+     async_comp.completion_handler);
   return async_comp.result.get();
 }
 // template <typename CompletionToken,

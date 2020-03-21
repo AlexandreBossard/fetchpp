@@ -13,7 +13,5 @@ endif()
 
 add_subdirectory(libs/fetchpp)
 
-if(ENABLE_TESTING)
-  enable_testing()
-endif()
+enable_testing()
 

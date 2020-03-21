@@ -59,7 +59,7 @@ fmt::string_view to_string_view(boost::string_view const& v)
 // TEST_CASE("http get with headers", "[https][sync]")
 // {
 //   auto const response =
-//       fetchpp::fetch("get"_https,
+//       fetchpp::fetch("https://api.paf.com/v2/push_keys?index=2",
 //                      fetchpp::verb::get,
 //                      {{"x-special-header", "a value worth reading"},
 //                       {fetchpp::field::topic, "http by the book"}});
@@ -70,25 +70,25 @@ fmt::string_view to_string_view(boost::string_view const& v)
 //   fmt::print("{}\n", response.body());
 // }
 
-// TEST_CASE("http async get", "[https][get][async]")
-// {
-//   fetchpp::net::io_context ioc;
-//   fetchpp::ssl::context context(fetchpp::ssl::context::tlsv12_client);
-//   fetchpp::beast::ssl_stream<fetchpp::beast::tcp_stream> stream(ioc,
-//   context); auto fut = fetchpp::async_get(
-//       stream,
-//       "get"_https,
-//       {{fetchpp::field::content_type, "text/html; charset=UTF8"}},
-//       boost::asio::use_future);
-//   ioc.run();
-//   auto response = fut.get();
-//   REQUIRE(response.result_int() == 200);
-//   REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
-//   auto const& body = response.body();
-//   auto json = nlohmann::json::parse(body.begin(), body.end());
-//   auto ct = std::string{to_string(fetchpp::field::content_type)};
-//   REQUIRE(json.at("headers").at(ct) == "text/html; charset=UTF8");
-// }
+TEST_CASE("http async get", "[https][get][async]")
+{
+  fetchpp::net::io_context ioc;
+  fetchpp::net::ssl::context context(fetchpp::net::ssl::context::tlsv12_client);
+  fetchpp::beast::ssl_stream<fetchpp::beast::tcp_stream> stream(ioc, context);
+  auto fut = fetchpp::async_get(
+      stream,
+      "get"_https,
+      {{fetchpp::field::content_type, "text/html; charset=UTF8"}},
+      boost::asio::use_future);
+  ioc.run();
+  auto response = fut.get();
+  REQUIRE(response.result_int() == 200);
+  REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
+  auto const& body = response.body();
+  auto json = nlohmann::json::parse(body.begin(), body.end());
+  auto ct = std::string{to_string(fetchpp::field::content_type)};
+  REQUIRE(json.at("headers").at(ct) == "text/html; charset=UTF8");
+}
 
 // TEST_CASE("http async post string", "[https][post][async]")
 // {

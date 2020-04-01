@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fetchpp/message.hpp>
+#include <fetchpp/cache_mode.hpp>
 #include <fetchpp/field_arg.hpp>
 #include <fetchpp/redirect_handling.hpp>
 
@@ -8,14 +8,12 @@
 
 namespace fetchpp
 {
-template <typename BodyRequest = http::string_body>
 struct options
 {
-  http::verb method = http::verb::get;
+  options() = default;
+  std::size_t version = 11;
   cache_mode cache = cache_mode::no_store;
   redirect_handling redirect = redirect_handling::manual;
-  std::vector<field_arg> headers;
-  typename BodyRequest::value_type body;
-  bool keep_alive = false;
+  connection persistence = connection::close;
 };
 }

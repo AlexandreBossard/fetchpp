@@ -35,10 +35,8 @@ template <typename CompletionToken, typename BodyResponse>
 using async_http_return_t =
     typename async_http_result<CompletionToken, BodyResponse>::return_type;
 
-template <typename GetHandler,
-          typename AsyncStream,
-          typename BodyResponse = http::string_body>
-auto async_get(AsyncStream& stream,
+template <typename GetHandler, typename BodyResponse = http::string_body>
+auto async_get(net::io_context& ioc,
                std::string const& url_str,
                std::initializer_list<field_arg> fields,
                GetHandler&& handler)
@@ -47,11 +45,15 @@ auto async_get(AsyncStream& stream,
   using BodyRequest = http::empty_body;
   using Request = http::request<BodyRequest>;
   using Response = http::response<BodyResponse>;
-
   using async_completion_t =
       net::async_completion<GetHandler,
                             void(error_code, http::response<BodyResponse>)>;
   using handler_type = typename async_completion_t::completion_handler_type;
+  using AsyncStream = beast::ssl_stream<beast::tcp_stream>;
+
+  net::ssl::context sslc(net::ssl::context::tlsv12_client);
+  AsyncStream stream(ioc, sslc);
+
   using base_type =
       beast::stable_async_base<handler_type,
                                typename AsyncStream::executor_type>;
@@ -68,27 +70,30 @@ auto async_get(AsyncStream& stream,
 
     struct temporary_data
     {
+      AsyncStream stream;
       Request req;
       Response res;
       beast::flat_buffer buffer;
       tcp::resolver resolver;
-      temporary_data(AsyncStream& stream, Request req)
-        : req(req), res(), buffer(), resolver(stream.get_executor())
+      temporary_data(AsyncStream pstream, Request req)
+        : stream(std::move(pstream)),
+          req(req),
+          res(),
+          buffer(),
+          resolver(stream.get_executor())
       {
       }
     };
 
-    AsyncStream& stream;
     url _url;
     temporary_data& data;
     status state = status::starting;
 
-    op(AsyncStream& stream, Request preq, url purl, handler_type& handler)
+    op(AsyncStream stream, Request preq, url purl, handler_type& handler)
       : base_type(std::move(handler), stream.get_executor()),
-        stream(stream),
         _url(purl),
         data(beast::allocate_stable<temporary_data>(
-            *this, stream, std::move(preq)))
+            *this, std::move(stream), std::move(preq)))
     {
       (*this)();
     }
@@ -106,7 +111,7 @@ auto async_get(AsyncStream& stream,
           return;
         case connecting:
           state = status::processing;
-          async_process_one(stream, data.req, data.res, std::move(*this));
+          async_process_one(data.stream, data.req, data.res, std::move(*this));
           return;
         default:
           assert(0);
@@ -126,7 +131,7 @@ auto async_get(AsyncStream& stream,
         return;
       }
       state = status::connecting;
-      async_connect(stream, results, std::move(*this));
+      async_connect(data.stream, results, std::move(*this));
     }
   };
 
@@ -137,7 +142,7 @@ auto async_get(AsyncStream& stream,
                                                       redirect_handling::manual,
                                                       fields});
   async_completion_t async_comp{handler};
-  op(stream,
+  op(std::move(stream),
      std::move(request),
      std::move(curl),
      async_comp.completion_handler);
@@ -166,7 +171,7 @@ auto async_get(AsyncStream& stream,
 //       http::verb::post, url.target, 11, std::move(data));
 
 //   req.set(http::field::host, url.domain);
-//   req.set(http::field::user_agent, fetchpp::VERSION);
+//   req.set(http::field::user_agent, fetchpp::USER_AGENT);
 //   for (auto const& field : fields)
 //     req.insert(field.field, field.field_name, field.value);
 //   req.prepare_payload();

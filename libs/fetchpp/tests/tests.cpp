@@ -14,7 +14,6 @@
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/ssl/ssl_stream.hpp>
 
-#include <fmt/core.h>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <nlohmann/json.hpp>
@@ -26,6 +25,7 @@ fmt::string_view to_string_view(boost::string_view const& v)
   return fmt::string_view{v.data(), v.length()};
 }
 }
+
 // namespace fmt
 // {
 // template <>
@@ -72,16 +72,13 @@ fmt::string_view to_string_view(boost::string_view const& v)
 
 TEST_CASE_METHOD(ioc_fixture, "http async get", "[https][get][async]")
 {
-  fetchpp::net::io_context ioc;
-  fetchpp::net::ssl::context context(fetchpp::net::ssl::context::tlsv12_client);
-  fetchpp::beast::ssl_stream<fetchpp::beast::tcp_stream> stream(ioc, context);
-  auto fut = fetchpp::async_get(
-      stream,
-      "get"_https,
-      {{fetchpp::field::content_type, "text/html; charset=UTF8"}},
-      boost::asio::use_future);
-  ioc.run();
-  auto response = fut.get();
+  auto response =
+      fetchpp::async_get(
+          ioc,
+          "get"_https,
+          {{fetchpp::field::content_type, "text/html; charset=UTF8"}},
+          boost::asio::use_future)
+          .get();
   REQUIRE(response.result_int() == 200);
   REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
   auto const& body = response.body();
@@ -90,19 +87,16 @@ TEST_CASE_METHOD(ioc_fixture, "http async get", "[https][get][async]")
   REQUIRE(json.at("headers").at(ct) == "text/html; charset=UTF8");
 }
 
-// TEST_CASE("http async post string", "[https][post][async]")
+// TEST_CASE_METHOD(ioc_fixture, "http async post string",
+// "[https][post][async]")
 // {
-//   fetchpp::net::io_context ioc;
-//   fetchpp::ssl::context context(fetchpp::ssl::context::tlsv12_client);
-//   fetchpp::beast::ssl_stream<fetchpp::beast::tcp_stream> stream(ioc,
-//   context); auto const data = std::string("this is my data"); auto fut =
-//   fetchpp::async_post(stream,
-//                                  "post"_https,
-//                                  data,
-//                                  {{"X-corp-header", "corp value"}},
-//                                  boost::asio::use_future);
-//   ioc.run();
-//   auto response = fut.get();
+//   auto const data = std::string("this is my data");
+//   auto response = fetchpp::async_post(ioc,
+//                                       "post"_https,
+//                                       data,
+//                                       {{"X-corp-header", "corp value"}},
+//                                       boost::asio::use_future)
+//                       .get();
 //   REQUIRE(response.result_int() == 200);
 //   REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
 //   auto const& body = response.body();

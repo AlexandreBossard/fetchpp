@@ -39,7 +39,7 @@ template <typename GetHandler,
           typename AsyncStream,
           typename BodyResponse = http::string_body>
 auto async_get(AsyncStream& stream,
-               std::string const& purl,
+               std::string const& url_str,
                std::initializer_list<field_arg> fields,
                GetHandler&& handler)
     -> async_http_return_t<GetHandler, BodyResponse>
@@ -130,7 +130,7 @@ auto async_get(AsyncStream& stream,
     }
   };
 
-  auto const curl = url{purl};
+  auto const curl = url::parse(url_str);
   auto request = prepare_request(curl,
                                  options<BodyRequest>{http::verb::get,
                                                       cache_mode::no_store,

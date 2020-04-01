@@ -7,7 +7,11 @@ namespace fetchpp
 class url
 {
 public:
-  explicit url(std::string const& url);
+  url(std::string scheme,
+      std::string domain,
+      uint16_t port,
+      std::string target);
+  static url parse(std::string const& url);
 
   // [[nodiscard]] std::string str() const;
 
@@ -16,10 +20,10 @@ public:
   uint16_t port() const;
   std::string const& target() const;
 
-  void set_scheme(std::string const&);
-  void set_domain(std::string const&);
+  void set_scheme(std::string);
+  void set_domain(std::string);
   void set_port(uint16_t);
-  void set_target(std::string const&);
+  void set_target(std::string);
 
 private:
   std::string _scheme;

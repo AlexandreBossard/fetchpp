@@ -26,7 +26,7 @@ TEST_CASE("process one get request", "[https][process_one][get][async]")
   fetchpp::request<fetchpp::empty_body> request(
       fetchpp::http::verb::get, "/get", 11);
   request.set(fetchpp::field::host, TEST_URL);
-  request.set(fetchpp::field::user_agent, fetchpp::VERSION);
+  request.set(fetchpp::field::user_agent, fetchpp::USER_AGENT);
   fetchpp::response<fetchpp::string_body> response;
 
   http_ssl_connect(ioc, stream, TEST_URL);
@@ -48,7 +48,7 @@ TEST_CASE("connect", "[http][connect][async]")
   fetchpp::request<fetchpp::empty_body> request(
       fetchpp::http::verb::get, "/get", 11);
   request.set(fetchpp::field::host, TEST_URL);
-  request.set(fetchpp::field::user_agent, fetchpp::VERSION);
+  request.set(fetchpp::field::user_agent, fetchpp::USER_AGENT);
   fetchpp::response<fetchpp::string_body> response;
 
 

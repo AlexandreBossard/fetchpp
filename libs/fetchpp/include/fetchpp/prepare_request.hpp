@@ -13,7 +13,7 @@ auto prepare_request(url const& url, options<BodyRequest> const& opt)
   auto req = http::request<BodyRequest>(
       opt.method, url.target(), 11, std::move(opt.body));
   req.set(http::field::host, url.domain());
-  req.set(http::field::user_agent, fetchpp::VERSION);
+  req.set(http::field::user_agent, fetchpp::USER_AGENT);
   for (auto const& field : opt.headers)
     req.insert(field.field, field.field_name, field.value);
   // auto it = req.find(http::field::connection);

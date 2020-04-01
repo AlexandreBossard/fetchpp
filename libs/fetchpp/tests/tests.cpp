@@ -70,7 +70,7 @@ fmt::string_view to_string_view(boost::string_view const& v)
 //   fmt::print("{}\n", response.body());
 // }
 
-TEST_CASE("http async get", "[https][get][async]")
+TEST_CASE_METHOD(ioc_fixture, "http async get", "[https][get][async]")
 {
   fetchpp::net::io_context ioc;
   fetchpp::net::ssl::context context(fetchpp::net::ssl::context::tlsv12_client);

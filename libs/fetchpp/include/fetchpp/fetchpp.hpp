@@ -1,27 +1,22 @@
 #pragma once
 
+#include <fetchpp/cache_mode.hpp>
 #include <fetchpp/connect.hpp>
+#include <fetchpp/field_arg.hpp>
+#include <fetchpp/options.hpp>
 #include <fetchpp/process_one.hpp>
+#include <fetchpp/redirect_handling.hpp>
+#include <fetchpp/url.hpp>
+
+#include <fetchpp/detail/prepare_request.hpp>
 
 #include <fetchpp/alias/error_code.hpp>
 #include <fetchpp/alias/http.hpp>
 #include <fetchpp/alias/net.hpp>
 
-#include <fetchpp/cache_mode.hpp>
-#include <fetchpp/field_arg.hpp>
-#include <fetchpp/options.hpp>
-#include <fetchpp/prepare_request.hpp>
-#include <fetchpp/redirect_handling.hpp>
-
-#include <fetchpp/version.hpp>
-
-#include <fetchpp/url.hpp>
-
 #include <boost/beast/core/async_base.hpp>
 #include <boost/beast/http/empty_body.hpp>
 #include <boost/beast/http/string_body.hpp>
-
-#include <fmt/format.h>
 
 namespace fetchpp
 {
@@ -136,11 +131,12 @@ auto async_get(net::io_context& ioc,
   };
 
   auto const curl = url::parse(url_str);
-  auto request = prepare_request(curl,
-                                 options<BodyRequest>{http::verb::get,
-                                                      cache_mode::no_store,
-                                                      redirect_handling::manual,
-                                                      fields});
+  auto request =
+      detail::prepare_request(curl,
+                              options<BodyRequest>{http::verb::get,
+                                                   cache_mode::no_store,
+                                                   redirect_handling::manual,
+                                                   fields});
   async_completion_t async_comp{handler};
   op(std::move(stream),
      std::move(request),

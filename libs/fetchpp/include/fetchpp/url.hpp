@@ -13,8 +13,6 @@ public:
       std::string target);
   static url parse(std::string const& url);
 
-  // [[nodiscard]] std::string str() const;
-
   std::string const& scheme() const;
   std::string const& domain() const;
   uint16_t port() const;

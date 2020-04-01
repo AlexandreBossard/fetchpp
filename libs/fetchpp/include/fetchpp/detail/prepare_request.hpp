@@ -2,9 +2,13 @@
 
 #include <fetchpp/url.hpp>
 
+#include <fetchpp/message.hpp>
+#include <fetchpp/options.hpp>
 #include <fetchpp/version.hpp>
 
 namespace fetchpp
+{
+namespace detail
 {
 template <typename BodyRequest>
 auto prepare_request(url const& url, options<BodyRequest> const& opt)
@@ -16,12 +20,8 @@ auto prepare_request(url const& url, options<BodyRequest> const& opt)
   req.set(http::field::user_agent, fetchpp::USER_AGENT);
   for (auto const& field : opt.headers)
     req.insert(field.field, field.field_name, field.value);
-  // auto it = req.find(http::field::connection);
-  // if (it != req.end())
-  //   opt.keep_alive = it == beast::string_view("keep-alive");
-  // else if (opt.keep_alive)
-  //   req.set(http::field::connection, "keep-alive");
   req.prepare_payload();
   return req;
+}
 }
 }

@@ -3,6 +3,7 @@
 #include <boost/asio/compose.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ssl/stream.hpp>
+#include <boost/beast/ssl/ssl_stream.hpp>
 
 #include <fetchpp/alias/beast.hpp>
 #include <fetchpp/alias/error_code.hpp>

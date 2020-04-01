@@ -38,7 +38,7 @@ auto async_get(net::io_context& ioc,
     -> async_http_return_t<GetHandler, BodyResponse>
 {
   using BodyRequest = http::empty_body;
-  using Request = http::request<BodyRequest>;
+  using Request = fetchpp::request<BodyRequest>;
   using Response = http::response<BodyResponse>;
   using async_completion_t =
       net::async_completion<GetHandler,
@@ -72,7 +72,7 @@ auto async_get(net::io_context& ioc,
       tcp::resolver resolver;
       temporary_data(AsyncStream pstream, Request req)
         : stream(std::move(pstream)),
-          req(req),
+          req(std::move(req)),
           res(),
           buffer(),
           resolver(stream.get_executor())
@@ -80,13 +80,11 @@ auto async_get(net::io_context& ioc,
       }
     };
 
-    url _url;
     temporary_data& data;
     status state = status::starting;
 
-    op(AsyncStream stream, Request preq, url purl, handler_type& handler)
+    op(AsyncStream stream, Request preq, handler_type& handler)
       : base_type(std::move(handler), stream.get_executor()),
-        _url(purl),
         data(beast::allocate_stable<temporary_data>(
             *this, std::move(stream), std::move(preq)))
     {
@@ -101,8 +99,9 @@ auto async_get(net::io_context& ioc,
         {
         case starting:
           state = status::resolving;
-          data.resolver.async_resolve(
-              _url.domain(), _url.scheme(), std::move(*this));
+          data.resolver.async_resolve(data.req.uri().domain(),
+                                      data.req.uri().scheme(),
+                                      std::move(*this));
           return;
         case connecting:
           state = status::processing;
@@ -130,18 +129,14 @@ auto async_get(net::io_context& ioc,
     }
   };
 
-  auto const curl = url::parse(url_str);
-  auto request =
-      detail::prepare_request(curl,
-                              options<BodyRequest>{http::verb::get,
-                                                   cache_mode::no_store,
-                                                   redirect_handling::manual,
-                                                   fields});
+  Request request(fetchpp::http::verb::get,
+                  fetchpp::url::parse(url_str),
+                  fetchpp::options{});
+  for (auto const& field : fields)
+    request.insert(field.field, field.field_name, field.value);
+  request.prepare_payload();
   async_completion_t async_comp{handler};
-  op(std::move(stream),
-     std::move(request),
-     std::move(curl),
-     async_comp.completion_handler);
+  op(std::move(stream), std::move(request), async_comp.completion_handler);
   return async_comp.result.get();
 }
 // template <typename CompletionToken,

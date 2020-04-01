@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fetchpp/request.hpp>
+
 #include <boost/asio/compose.hpp>
 #include <boost/beast/core/flat_buffer.hpp>
 #include <boost/beast/http/read.hpp>

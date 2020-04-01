@@ -10,7 +10,7 @@
 
 namespace fetchpp
 {
-using http::request;
+// using http::request;
 using http::response;
 
 using http::empty_body;

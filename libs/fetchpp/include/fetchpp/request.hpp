@@ -39,10 +39,10 @@ template <typename BodyType = http::empty_body,
           typename Value = typename BodyType::value_type>
 request<BodyType> make_request(http::verb verb,
                                url uri,
-                               options opt,
-                               Value body);
+                               options opt = {},
+                               Value body = {});
 
-inline auto make_request(http::verb verb, url uri, options opt)
+inline auto make_request(http::verb verb, url uri, options opt = {})
 {
   return request<http::empty_body>(verb, uri, opt);
 }

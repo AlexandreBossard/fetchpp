@@ -46,6 +46,22 @@ fmt::string_view to_string_view(boost::string_view const& v)
 // };
 // }
 
+TEST_CASE_METHOD(ioc_fixture, "http async fetch", "[https][fetch][get][async]")
+{
+  auto request =
+      make_request(fetchpp::http::verb::get, fetchpp::url::parse("get"_https));
+  request.set(fetchpp::field::content_type, "text/html; charset=UTF8");
+  auto response =
+      fetchpp::async_fetch(ioc, std::move(request), boost::asio::use_future)
+          .get();
+  REQUIRE(response.result_int() == 200);
+  REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
+  auto json = nlohmann::json::parse(response.body());
+  auto const content_type = json.at("headers").at(
+      std::string{to_string(fetchpp::field::content_type)});
+  REQUIRE(content_type == "text/html; charset=UTF8");
+}
+
 TEST_CASE_METHOD(ioc_fixture, "http async get", "[https][get][async]")
 {
   auto response =

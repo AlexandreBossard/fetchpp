@@ -79,21 +79,20 @@ TEST_CASE_METHOD(ioc_fixture, "http async get", "[https][get][async]")
   REQUIRE(json.at("headers").at(ct) == "text/html; charset=UTF8");
 }
 
-// TEST_CASE_METHOD(ioc_fixture, "http async post string",
-// "[https][post][async]")
-// {
-//   auto const data = std::string("this is my data");
-//   auto response = fetchpp::async_post(ioc,
-//                                       "post"_https,
-//                                       data,
-//                                       {{"X-corp-header", "corp value"}},
-//                                       boost::asio::use_future)
-//                       .get();
-//   REQUIRE(response.result_int() == 200);
-//   REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
-//   auto const& body = response.body();
-//   auto json = nlohmann::json::parse(body.begin(), body.end());
-//   fmt::print("{}\n", response);
-//   REQUIRE(json.at("headers").at("X-Corp-Header") == "corp value");
-//   REQUIRE(json.at("data") == data);
-// }
+TEST_CASE_METHOD(ioc_fixture, "http async post string", "[https][post][async]")
+{
+  auto const data = std::string("this is my data");
+  auto response = fetchpp::async_post(ioc,
+                                      "post"_https,
+                                      std::move(data),
+                                      {{"X-corp-header", "corp value"}},
+                                      boost::asio::use_future)
+                      .get();
+  REQUIRE(response.result_int() == 200);
+  REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
+  auto const& body = response.body();
+  auto json = nlohmann::json::parse(body.begin(), body.end());
+  fmt::print("{}\n", response);
+  REQUIRE(json.at("headers").at("X-Corp-Header") == "corp value");
+  REQUIRE(json.at("data") == data);
+}

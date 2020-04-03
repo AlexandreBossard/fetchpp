@@ -1,4 +1,5 @@
 add_executable(test_functional
+  helpers/format.cpp
   tests.cpp
   test_process_one.cpp
   main.cpp

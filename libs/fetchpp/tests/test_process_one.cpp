@@ -12,9 +12,16 @@
 #include <boost/beast/http/string_body.hpp>
 #include <boost/beast/ssl/ssl_stream.hpp>
 
-#include "helpers.hpp"
+#include "helpers/format.hpp"
+#include "helpers/https_connect.hpp"
+#include "helpers/ioc_fixture.hpp"
+#include "helpers/test_domain.hpp"
 
 #include <nlohmann/json.hpp>
+
+using namespace test::helpers;
+using namespace test::helpers::http_literals;
+using test::helpers::ioc_fixture;
 
 namespace fetchpp
 {

@@ -1,7 +1,5 @@
 #include <catch2/catch.hpp>
 
-#include "helpers.hpp"
-
 #include <boost/beast/core/buffers_to_string.hpp>
 
 #include <fetchpp/fetchpp.hpp>
@@ -14,37 +12,16 @@
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/ssl/ssl_stream.hpp>
 
+#include "helpers/format.hpp"
+#include "helpers/ioc_fixture.hpp"
+#include "helpers/test_domain.hpp"
+
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <nlohmann/json.hpp>
 
-namespace boost
-{
-fmt::string_view to_string_view(boost::string_view const& v)
-{
-  return fmt::string_view{v.data(), v.length()};
-}
-}
-
-// namespace fmt
-// {
-// template <>
-// struct formatter<boost::beast::multi_buffer>
-// {
-//   template <typename ParseContext>
-//   constexpr auto parse(ParseContext& ctx)
-//   {
-//     return ctx.begin();
-//   }
-
-//   template <typename FormatContext>
-//   auto format(boost::beast::multi_buffer const& b, FormatContext& ctx)
-//   {
-//     auto const v = boost::beast::buffers_to_string(b.data());
-//     return format_to(ctx.out(), "{}", v);
-//   }
-// };
-// }
+using namespace test::helpers::http_literals;
+using test::helpers::ioc_fixture;
 
 TEST_CASE_METHOD(ioc_fixture, "http async fetch", "[https][fetch][get][async]")
 {
@@ -92,7 +69,6 @@ TEST_CASE_METHOD(ioc_fixture, "http async post string", "[https][post][async]")
   REQUIRE(response.at(fetchpp::field::content_type) == "application/json");
   auto const& body = response.body();
   auto json = nlohmann::json::parse(body.begin(), body.end());
-  fmt::print("{}\n", response);
   REQUIRE(json.at("headers").at("X-Corp-Header") == "corp value");
   REQUIRE(json.at("data") == data);
 }

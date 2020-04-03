@@ -50,7 +50,7 @@ TEST_CASE_METHOD(ioc_fixture, "http async fetch", "[https][fetch][get][async]")
 {
   auto request =
       make_request(fetchpp::http::verb::get, fetchpp::url::parse("get"_https));
-  request.set(fetchpp::field::content_type, "text/html; charset=UTF8");
+  request.content_type("text/html; charset=UTF8");
   auto response =
       fetchpp::async_fetch(ioc, std::move(request), boost::asio::use_future)
           .get();

@@ -7,6 +7,7 @@
 #include <boost/beast/http/empty_body.hpp>
 #include <boost/beast/http/fields.hpp>
 #include <boost/beast/http/message.hpp>
+#include <boost/beast/http/string_body.hpp>
 #include <boost/beast/http/verb.hpp>
 #include <fetchpp/alias/http.hpp>
 
@@ -29,6 +30,8 @@ public:
 
   fetchpp::options const& options() const;
   url const& uri() const;
+  boost::string_view content_type() const;
+  void content_type(beast::string_param const& param);
 
 private:
   url _uri;
@@ -70,7 +73,12 @@ url const& request<BodyType>::uri() const
   return _uri;
 }
 
-template <typename BodyType = http::empty_body,
+template <typename BodyType>
+void request<BodyType>::content_type(beast::string_param const& param)
+{
+  this->insert(beast::http::field::content_type, param);
+}
+
           typename Value = typename BodyType::value_type>
 request<BodyType> make_request(http::verb verb,
                                url uri,
